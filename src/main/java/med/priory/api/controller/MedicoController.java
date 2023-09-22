@@ -20,19 +20,19 @@ public class MedicoController {
     @Autowired // métodos para acceder y manipular datos relacionados con médicos en la base de datos
     private MedicoRepository medicoRepository;
 
-
-    @PostMapping  // request 1 (envía datos)
+    @PostMapping // request 1 (envía datos)
+    @Transactional
     public ResponseEntity<DatosRespuestaMedico> registrarMedico(@RequestBody @Valid DatosRegistroMedico datosRegistroMedico,
                                                                 UriComponentsBuilder uriComponentsBuilder) {
         Medico medico = medicoRepository.save(new Medico(datosRegistroMedico));
-        DatosRespuestaMedico datosRespuestaMedico = new DatosRespuestaMedico(medico.getId(), medico.getNombre(),
-                                                                            medico.getEmail(), medico.getTelefono(),
-                                                                            medico.getEspecialidad().toString(),
+        DatosRespuestaMedico datosRespuestaMedico = new DatosRespuestaMedico(medico.getId(), medico.getNombre(), medico.getEmail(),
+                                                                            medico.getTelefono(), medico.getEspecialidad().toString(),
                 new DatosDireccion(medico.getDireccion().getCalle(), medico.getDireccion().getDistrito(),
                                     medico.getDireccion().getCiudad(), medico.getDireccion().getNumero(),
                                     medico.getDireccion().getComplemento()));
-        URI url = uriComponentsBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri();    // URL dinamico
+        URI url = uriComponentsBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri(); // URL dinamico
         return ResponseEntity.created(url).body(datosRespuestaMedico);
+
     }
 
     @GetMapping // request 2 (obtiene datos)
@@ -41,20 +41,20 @@ public class MedicoController {
         return ResponseEntity.ok(medicoRepository.findByActivoTrue(paginacion).map(DatosListadoMedico::new));
     }
 
-    @PutMapping
+    @PutMapping // request 3 (actualiza datos)
     @Transactional
     public ResponseEntity actualizarMedico(@RequestBody @Valid DatosActualizarMedico datosActualizarMedico) {
         Medico medico = medicoRepository.getReferenceById(datosActualizarMedico.id());
         medico.actualizarDatos(datosActualizarMedico);
         return ResponseEntity.ok(new DatosRespuestaMedico(medico.getId(), medico.getNombre(), medico.getEmail(),
-                                                         medico.getTelefono(), medico.getEspecialidad().toString(),
+                                                           medico.getTelefono(), medico.getEspecialidad().toString(),
                 new DatosDireccion(medico.getDireccion().getCalle(), medico.getDireccion().getDistrito(),
                                     medico.getDireccion().getCiudad(), medico.getDireccion().getNumero(),
                                     medico.getDireccion().getComplemento())));
     }
 
     // DELETE LOGICO
-    @DeleteMapping("/{id}") // request 4 (elimina datos) con pathvariable
+    @DeleteMapping("/{id}") // request 3 (delete de datos mediante id es decir una pathvariable)
     @Transactional // commit de la BD
     public ResponseEntity eliminarMedico(@PathVariable Long id) {
         Medico medico = medicoRepository.getReferenceById(id);
