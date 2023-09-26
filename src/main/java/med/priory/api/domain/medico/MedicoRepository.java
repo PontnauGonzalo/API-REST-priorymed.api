@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 
 @Repository
-public interface MedicoRepository extends JpaRepository<Medico, Long> {
+public interface MedicoRepository extends JpaRepository <Medico, Long> {
     Page<Medico> findByActivoTrue(Pageable paginacion);  // busca médicos activos y permite paginación
 
-    // JPA queries
-    @Query("""
+        // JPA queries
+        @Query("""
             select m from Medico m
             where m.activo= 1 
             and
@@ -24,7 +24,7 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
                 where
                 c.fecha=:fecha
             )
-            order by rand() 
+            order by rand()
             limit 1
             """) //  'order by rand()' ordena de forma aleatoria
     Medico seleccionarMedicoConEspecialidadEnFecha(Especialidad especialidad, LocalDateTime fecha);

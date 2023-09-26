@@ -13,8 +13,9 @@ public class PacienteSinConsulta implements ValidadorDeConsultas{
     private ConsultaRepository repository;
 
     public void validar(DatosAgendarConsulta datos)  {
-        var primerHorario = datos.fecha().withHour(7);
-        var ultimoHorario= datos.fecha().withHour(18);
+
+        var primerHorario = datos.fecha().withHour(7); // se puede asignar consulta desde
+        var ultimoHorario= datos.fecha().withHour(18); // 7hs a 18hs
 
         var pacienteConConsulta=repository.existsByPacienteIdAndFechaBetween(datos.idPaciente(),primerHorario,ultimoHorario);
 

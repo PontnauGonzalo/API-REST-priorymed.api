@@ -18,16 +18,16 @@ public class AgendaDeConsultaService {
     private MedicoRepository medicoRepository;
     @Autowired
     private ConsultaRepository consultaRepository;
-    @Autowired
-    List<ValidadorDeConsultas> validadores;
+    @Autowired // lista que hace saber a spring que todos los elementos q implementen <ValidadorDeConsultas> ..
+    List <ValidadorDeConsultas> validadores; // se inyecten en la lista y se encuentren disponibles
 
     public DatosDetalleConsulta agendar(DatosAgendarConsulta datos)
     {
-        if(!pacienteRepository.findById(datos.idPaciente()).isPresent()){
+        if(!pacienteRepository.findById(datos.idPaciente()).isPresent()) { // en caso q no exista el id
             throw new ValidacionDeIntegridad("Este id de paciente no fue encontrado");
         }
 
-        if(datos.idMedico() != null && medicoRepository.existsById(datos.idMedico())){
+        if(datos.idMedico() != null && !medicoRepository.existsById(datos.idMedico())){
             throw new ValidacionDeIntegridad("Este id de medico no fue encontrado");
         }
 
@@ -37,7 +37,7 @@ public class AgendaDeConsultaService {
 
         var medico = seleccionarMedico(datos);
 
-        if(medico==null){
+        if(medico == null){
             throw new ValidacionDeIntegridad("no existen medicos disponibles para este horario y especialidad");
         }
 
