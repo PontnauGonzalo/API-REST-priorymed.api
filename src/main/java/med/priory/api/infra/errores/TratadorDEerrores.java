@@ -8,37 +8,32 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
-
 @RestControllerAdvice
 public class TratadorDEerrores {
 
-    @ExceptionHandler (EntityNotFoundException.class) // manejando excepciones del tipo EntityNotFoundException.
-    public ResponseEntity tratarError404() {  // Construimos una respuesta HTTP con el código de estado 404 (Not Found)
-        return ResponseEntity.notFound().build(); // Para indicar que la entidad solicitada no se ha encontrado.
+    // EntityNotFoundException devuelve HTTP 404 (Not Found) si se lanza esa excepción.
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity tratarError404() {
+        return ResponseEntity.notFound().build();
     }
 
-
+    // MethodArgumentNotValidException
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<DatosErrorValidacion>> tratarError400(MethodArgumentNotValidException e){
+    public ResponseEntity tratarError400(MethodArgumentNotValidException e) {
         var errores = e.getFieldErrors().stream().map(DatosErrorValidacion::new).toList();
-        // errores de validación luego, los mapeamos a objetos de tipo DatosErrorValidacion.
         return ResponseEntity.badRequest().body(errores);
-    }// el body es para avisar al cliente donde es el error
+    }
 
+    // ValidacionDeIntegridad (integridad de datos.)
     @ExceptionHandler(ValidacionDeIntegridad.class)
-    public ResponseEntity errorHandlerValidacionesIntegridad(Exception e){
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity errorHandlerValidacionesDeNegocio(Exception e){
+    public ResponseEntity errorHandlerValidacionesIntegridad(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    private record DatosErrorValidacion(String campo, String error) { // DTO
+    // Clase interna privada DatosErrorValidacion - mapea los errores de validación en un formato personalizado.
+    private record DatosErrorValidacion(String campo, String error) {
         public DatosErrorValidacion(FieldError error) {
-            this(error.getField(), error.getDefaultMessage()); // mapeado
+            this(error.getField(), error.getDefaultMessage());
         }
     }
 }
-
